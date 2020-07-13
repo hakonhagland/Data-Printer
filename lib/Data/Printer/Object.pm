@@ -62,7 +62,7 @@ use Data::Printer::Filter::GenericClass;
 my @method_names =qw(
     name show_tainted show_unicode show_readonly show_lvalue show_refcount
     show_memsize memsize_unit print_escapes scalar_quotes escape_chars
-    caller_info caller_message caller_message_newline string_max
+    caller_info caller_message caller_message_newline caller_plugin string_max
     string_overflow string_preserve
     array_max array_overflow array_preserve hash_max hash_overflow
     hash_preserve ignore_keys unicode_charnames colored theme show_weak
@@ -143,6 +143,8 @@ sub _init {
                             'Printing in line __LINE__ of __FILENAME__:'
                         );
     $self->{'caller_message_newline'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'caller_message_newline', 1);
+    $self->{'caller_plugin'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'caller_plugin', undef);
+
     $self->{'string_max'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'string_max', 1024);
     $self->{'string_preserve'} = Data::Printer::Common::_fetch_anyof(
                              $props,
@@ -713,13 +715,31 @@ sub _check_weak {
 sub write_label {
     my ($self) = @_;
     return '' unless $self->caller_info;
-    my @caller = caller 2;
-
+    my @caller = caller 1;
     my $message = $self->caller_message;
-
-    $message =~ s/\b__PACKAGE__\b/$caller[0]/g;
-    $message =~ s/\b__FILENAME__\b/$caller[1]/g;
-    $message =~ s/\b__LINE__\b/$caller[2]/g;
+    if ( $self->caller_plugin ) {
+        my $name = "Data::Printer::Plugin::Caller::" . $self->caller_plugin;
+        my $req_name = $name;
+        $req_name =~ s{::}{/}g;
+        eval {
+            require "${req_name}.pm";
+        };
+        if ($@) {
+            warn "$@";
+            warn "Failed to load caller plugin: $name\n";
+            warn "Maybe you need to install the module?\n";
+            return "";
+        }
+        my $plugin = $name->new(
+            parent => $self, template => $message, caller => \@caller
+        );
+        $message = $plugin->get_message();
+    }
+    else {
+        $message =~ s/\b__PACKAGE__\b/$caller[0]/g;
+        $message =~ s/\b__FILENAME__\b/$caller[1]/g;
+        $message =~ s/\b__LINE__\b/$caller[2]/g;
+    }
 
     return $message . ($self->caller_message_newline ? "\n" : '');
 }

@@ -48,6 +48,7 @@ sub import {
         ;
 
     { no strict 'refs';
+      no warnings 'redefine';
         *{"$caller\::$imported"} = $exported;
         *{"$caller\::np"}        = \&np;
     }

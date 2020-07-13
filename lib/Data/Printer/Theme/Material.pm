@@ -41,7 +41,7 @@ sub colors {
         lvalue      => $code_for{strong_orange},  # lvalue label
         format      => $code_for{strong_orange},  # format type
         repeated    => $code_for{red},  # references to seen values
-        caller_info => $code_for{very_dark_gray},  # details on what's being printed
+        caller_info => $code_for{bright_cyan},  # details on what's being printed
         weak        => $code_for{green},  # weak references flag
         tainted     => $code_for{light_orange},  # tainted flag
         unicode     => $code_for{light_orange},  # utf8 flag
