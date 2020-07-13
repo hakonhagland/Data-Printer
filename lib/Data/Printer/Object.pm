@@ -63,7 +63,7 @@ my @method_names =qw(
     name show_tainted show_unicode show_readonly show_lvalue show_refcount
     show_memsize memsize_unit print_escapes scalar_quotes escape_chars
     caller_info caller_message caller_message_newline caller_message_position
-    string_max string_overflow string_preserve resolve_scalar_refs
+    string_max string_overflow string_preserve resolve_scalar_refs caller_plugin
     array_max array_overflow array_preserve hash_max hash_overflow
     hash_preserve unicode_charnames colored theme show_weak
     max_depth index separator end_separator class_method class hash_separator
@@ -152,9 +152,15 @@ sub _init {
                             'Printing in line __LINE__ of __FILENAME__:'
                         );
     $self->{'caller_message_newline'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'caller_message_newline', 1);
+<<<<<<< HEAD
     $self->{'caller_message_position'} = Data::Printer::Common::_fetch_anyof($props, 'caller_message_position', 'before', [qw(before after)]);
     $self->{'resolve_scalar_refs'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'resolve_scalar_refs', 0);
     $self->{'string_max'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'string_max', 4096);
+=======
+    $self->{'caller_plugin'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'caller_plugin', undef);
+
+    $self->{'string_max'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'string_max', 1024);
+>>>>>>> Refactor PR #74 to void PPI dependency.
     $self->{'string_preserve'} = Data::Printer::Common::_fetch_anyof(
                              $props,
                              'string_preserve',
@@ -754,12 +760,34 @@ sub _write_label {
     my ($self) = @_;
     return '' unless $self->caller_info;
     my @caller = caller 1;
+<<<<<<< HEAD
 
+=======
+>>>>>>> Refactor PR #74 to void PPI dependency.
     my $message = $self->caller_message;
-
-    $message =~ s/\b__PACKAGE__\b/$caller[0]/g;
-    $message =~ s/\b__FILENAME__\b/$caller[1]/g;
-    $message =~ s/\b__LINE__\b/$caller[2]/g;
+    if ( $self->caller_plugin ) {
+        my $name = "Data::Printer::Plugin::Caller::" . $self->caller_plugin;
+        my $req_name = $name;
+        $req_name =~ s{::}{/}g;
+        eval {
+            require "${req_name}.pm";
+        };
+        if ($@) {
+            warn "$@";
+            warn "Failed to load caller plugin: $name\n";
+            warn "Maybe you need to install the module?\n";
+            return "";
+        }
+        my $plugin = $name->new(
+            parent => $self, template => $message, caller => \@caller
+        );
+        $message = $plugin->get_message();
+    }
+    else {
+        $message =~ s/\b__PACKAGE__\b/$caller[0]/g;
+        $message =~ s/\b__FILENAME__\b/$caller[1]/g;
+        $message =~ s/\b__LINE__\b/$caller[2]/g;
+    }
 
     my $separator = $self->caller_message_newline ? "\n" : ' ';
     $message = $self->maybe_colorize($message, 'caller_info');
