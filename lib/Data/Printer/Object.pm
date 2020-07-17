@@ -152,15 +152,10 @@ sub _init {
                             'Printing in line __LINE__ of __FILENAME__:'
                         );
     $self->{'caller_message_newline'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'caller_message_newline', 1);
-<<<<<<< HEAD
     $self->{'caller_message_position'} = Data::Printer::Common::_fetch_anyof($props, 'caller_message_position', 'before', [qw(before after)]);
     $self->{'resolve_scalar_refs'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'resolve_scalar_refs', 0);
     $self->{'string_max'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'string_max', 4096);
-=======
     $self->{'caller_plugin'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'caller_plugin', undef);
-
-    $self->{'string_max'} = Data::Printer::Common::_fetch_scalar_or_default($props, 'string_max', 1024);
->>>>>>> Refactor PR #74 to void PPI dependency.
     $self->{'string_preserve'} = Data::Printer::Common::_fetch_anyof(
                              $props,
                              'string_preserve',
@@ -1246,7 +1241,13 @@ according to its inheritance. Can be set to 1 (always show), 0 (never show)
 or 'auto', which shows only when the object has more than one superclass.
 (default: 'auto')
 
+<<<<<<< HEAD
 =head4 universal
+=======
+=item * caller_plugin - name of caller plugin (default: undef). If you specify a name, e.g. c<PPI>, it will use c<Data::Printer::Plugin::Caller::PPI> to print the caller information label.
+
+=item * class - class properties to override.
+>>>>>>> Added Pod documentation for caller_plugin.
 
 Set this option to 1 to include UNIVERSAL methods to the list of public
 methods (like C<can> and C<isa>). (default: 0)

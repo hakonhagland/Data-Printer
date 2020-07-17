@@ -564,6 +564,7 @@ each of them:
     end_separator  = 0
     caller_info    = 0
     caller_message = 'Printing in line __LINE__ of __FILENAME__'
+    caller_plugin  = none
     max_depth      = 0
     deparse        = 0
     alias          = p
