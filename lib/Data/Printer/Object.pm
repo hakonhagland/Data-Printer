@@ -755,10 +755,6 @@ sub _write_label {
     my ($self) = @_;
     return '' unless $self->caller_info;
     my @caller = caller 1;
-<<<<<<< HEAD
-
-=======
->>>>>>> Refactor PR #74 to void PPI dependency.
     my $message = $self->caller_message;
     if ( $self->caller_plugin ) {
         my $name = "Data::Printer::Plugin::Caller::" . $self->caller_plugin;
@@ -1241,13 +1237,11 @@ according to its inheritance. Can be set to 1 (always show), 0 (never show)
 or 'auto', which shows only when the object has more than one superclass.
 (default: 'auto')
 
-<<<<<<< HEAD
-=head4 universal
-=======
-=item * caller_plugin - name of caller plugin (default: undef). If you specify a name, e.g. c<PPI>, it will use c<Data::Printer::Plugin::Caller::PPI> to print the caller information label.
+=head4 caller_plugin 
 
-=item * class - class properties to override.
->>>>>>> Added Pod documentation for caller_plugin.
+Name of caller plugin (default: undef). If you specify a name, e.g. c<PPI>, it will use c<Data::Printer::Plugin::Caller::PPI> to print the caller information label.
+
+=head4 universal
 
 Set this option to 1 to include UNIVERSAL methods to the list of public
 methods (like C<can> and C<isa>). (default: 0)
